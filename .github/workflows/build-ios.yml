@@ -1,0 +1,105 @@
+name: Build iOS App (AltStore)
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+  workflow_dispatch:  # 允許手動觸發
+
+jobs:
+  build:
+    runs-on: macos-14
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      - name: Setup Ruby (for CocoaPods)
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+
+      - name: Install npm deps
+        run: npm ci || npm install
+
+      - name: Sync web → dist
+        run: |
+          mkdir -p dist
+          cp index.html manifest.json sw.js dist/
+          cp icon-192.png icon-512.png apple-touch-icon.png dist/
+
+      - name: Capacitor sync
+        run: npx cap sync ios
+
+      - name: Install pods
+        working-directory: ios
+        run: pod install
+
+      - name: List signing identities
+        run: |
+          security find-identity -v -p codesigning | head -5 || echo "No signing identity (will use free provisioning)"
+
+      - name: Build for free provisioning (unsigned-ish)
+        working-directory: ios
+        run: |
+          # xcodebuild 編譯 iOS App
+          xcodebuild \
+            -workspace App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            EXPANDED_CODE_SIGN_IDENTITY="" \
+            ONLY_ACTIVE_ARCH=NO \
+            build
+
+      - name: Find built .app
+        working-directory: ios
+        run: |
+          APP_PATH=$(find build -name "*.app" -type d | head -1)
+          echo "APP_PATH=$APP_PATH" >> $GITHUB_ENV
+          echo "Found app at: $APP_PATH"
+          ls -la "$APP_PATH" | head
+
+      - name: Package as .ipa (no signing)
+        run: |
+          # .app 目錄包成 .ipa，AltStore 用時會自動重簽
+          mkdir -p Payload
+          cp -R "$APP_PATH" Payload/
+          zip -r 1kw-chat.ipa Payload
+          ls -la 1kw-chat.ipa
+
+      - name: Upload .ipa artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: 1kw-chat-ipa
+          path: 1kw-chat.ipa
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Summary
+        run: |
+          echo "## ✅ Build 完成" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📦 **下載 .ipa**: [點這裡](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 下一步：側載到 iPhone" >> $GITHUB_STEP_SUMMARY
+          echo "1. 下載上面的 1kw-chat-ipa artifact" >> $GITHUB_STEP_SUMMARY
+          echo "2. 把 .ipa 用 AirDrop 傳到 iPhone" >> $GITHUB_STEP_SUMMARY
+          echo "3. iPhone 安裝 [AltStore](https://altstore.io/)" >> $GITHUB_STEP_SUMMARY
+          echo "4. AltStore → My Apps → + → 選 .ipa" >> $GITHUB_STEP_SUMMARY
+          echo "5. 完成！App 會每 7 天自動重簽" >> $GITHUB_STEP_SUMMARY

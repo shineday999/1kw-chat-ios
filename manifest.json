@@ -1,0 +1,14 @@
+{
+  "name": "1kw Chat",
+  "short_name": "1kw Chat",
+  "description": "1kw 主機本地 LLM 聊天 (Qwen3.8 / Qwen3.6)",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fdf2f8",
+  "theme_color": "#ec4899",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

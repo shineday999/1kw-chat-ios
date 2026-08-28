@@ -1,0 +1,6 @@
+{
+  "appId": "cc.cd.qwen.onekwchat",
+  "appName": "1kw Chat",
+  "webDir": "dist",
+  "ios": { "contentInset": "automatic" }
+}
