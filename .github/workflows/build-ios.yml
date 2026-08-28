@@ -96,7 +96,7 @@ jobs:
         working-directory: ios
         run: |
           APP_PATH=$(find build -name "*.app" -type d | head -1)
-          echo "APP_PATH=$APP_PATH" >> $GITHUB_ENV
+          echo "APP_PATH=ios/$APP_PATH" >> $GITHUB_ENV
           echo "Found app at: $APP_PATH"
           ls -la "$APP_PATH" | head
 
