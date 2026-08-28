@@ -57,14 +57,22 @@ jobs:
       - name: Detect workspace or project
         working-directory: ios
         run: |
-          if [ -d App.xcworkspace ]; then
+          if [ -d App/App.xcodeproj ]; then
+            echo "BUILD_TARGET=App/App.xcodeproj" >> $GITHUB_ENV
+            echo "BUILD_FLAG=-project" >> $GITHUB_ENV
+            echo "Using App/App.xcodeproj (Capacitor 8 nested layout)"
+          elif [ -d App.xcworkspace ]; then
             echo "BUILD_TARGET=App.xcworkspace" >> $GITHUB_ENV
             echo "BUILD_FLAG=-workspace" >> $GITHUB_ENV
-            echo "Using workspace"
-          else
+            echo "Using App.xcworkspace"
+          elif [ -d App.xcodeproj ]; then
             echo "BUILD_TARGET=App.xcodeproj" >> $GITHUB_ENV
             echo "BUILD_FLAG=-project" >> $GITHUB_ENV
-            echo "Using xcodeproj (SPM-only project)"
+            echo "Using App.xcodeproj"
+          else
+            echo "ERROR: No Xcode project found"
+            ls -la
+            exit 1
           fi
 
       - name: Build iOS App
