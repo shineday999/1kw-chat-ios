@@ -54,12 +54,22 @@ jobs:
         run: |
           security find-identity -v -p codesigning | head -5 || echo "No signing identity (will use free provisioning)"
 
-      - name: Build for free provisioning (unsigned-ish)
+      - name: Detect workspace or project
         working-directory: ios
         run: |
-          # xcodebuild 編譯 iOS App
+          if [ -d App.xcworkspace ]; then
+            echo "BUILD_TARGET=App.xcworkspace" >> $GITHUB_ENV
+            echo "Using workspace"
+          else
+            echo "BUILD_TARGET=App.xcodeproj" >> $GITHUB_ENV
+            echo "Using xcodeproj (SPM-only project)"
+          fi
+
+      - name: Build iOS App
+        working-directory: ios
+        run: |
           xcodebuild \
-            -workspace App.xcworkspace \
+            -${{ env.BUILD_TARGET }} \
             -scheme App \
             -configuration Release \
             -sdk iphoneos \
@@ -68,7 +78,6 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
             EXPANDED_CODE_SIGN_IDENTITY="" \
             ONLY_ACTIVE_ARCH=NO \
             build
