@@ -12,27 +12,102 @@
 <title>1kw Chat</title>
 <style>
   /* ==================================================================
-     Design tokens
-     - 字級用 clamp()，自動從 iPhone SE (375px) 到 iPad Pro (1024px+) 縮放
-     - 間距也跟著縮放
+     Design tokens — 用 @media 階梯式而不是 vw clamp
+     因為 vw 在窄手機算出的 px 太小沒意義，桌機又會爆衝
+     iOS HIG 建議 iPhone 17px base，這裡用 16-19px 階梯
      ================================================================== */
   :root {
-    /* vw-based clamp：手機夠小、桌機會放大；不會被 max 卡住 */
-    --fs-xs: clamp(11px, 1.6vw, 13px);
-    --fs-sm: clamp(13px, 2vw, 16px);
-    --fs-md: clamp(15px, 2.4vw, 18px);   /* iOS safe: min 15px (但 input 用 16px+) */
-    --fs-lg: clamp(16px, 2.8vw, 20px);
-    --fs-xl: clamp(20px, 3.6vw, 28px);
-    --sp-1: clamp(4px, 0.8vw, 8px);
-    --sp-2: clamp(8px, 1.6vw, 14px);
-    --sp-3: clamp(12px, 2.4vw, 20px);
-    --sp-4: clamp(16px, 3.2vw, 28px);
-    --radius-bubble: clamp(14px, 2.5vw, 22px);
-    --radius-btn: clamp(8px, 1.5vw, 14px);
-    --header-h: clamp(48px, 6vw, 72px);
-    --composer-h: clamp(56px, 7vw, 80px);
-    --max-w: 720px;
-    --max-w-wide: 1200px;
+    /* default = iPhone（小螢幕基線） */
+    --fs-xs: 12px;
+    --fs-sm: 13px;
+    --fs-md: 16px;   /* 主字體 */
+    --fs-lg: 17px;
+    --fs-xl: 20px;   /* 標題 */
+    --sp-1: 4px;
+    --sp-2: 8px;
+    --sp-3: 12px;
+    --sp-4: 16px;
+    --radius-bubble: 14px;
+    --radius-btn: 10px;
+    --header-h: 52px;
+    --composer-h: 60px;
+    --max-w: 100%;
+    --max-w-wide: 100%;
+    --msg-max-w: 92%;
+  }
+
+  /* iPhone 大尺寸 (>= 414px) — iPhone Plus / Pro Max */
+  @media (min-width: 414px) {
+    :root {
+      --fs-md: 17px;
+      --fs-lg: 18px;
+      --fs-xl: 22px;
+      --sp-2: 10px;
+      --sp-3: 14px;
+      --sp-4: 18px;
+      --radius-bubble: 16px;
+      --header-h: 56px;
+      --composer-h: 64px;
+      --msg-max-w: 88%;
+    }
+  }
+
+  /* 平板 (>= 600px) — iPad / 大折疊機 */
+  @media (min-width: 600px) {
+    :root {
+      --fs-md: 18px;
+      --fs-lg: 19px;
+      --fs-xl: 24px;
+      --sp-2: 12px;
+      --sp-3: 16px;
+      --sp-4: 20px;
+      --radius-bubble: 18px;
+      --radius-btn: 12px;
+      --header-h: 64px;
+      --composer-h: 72px;
+      --max-w: 760px;
+      --msg-max-w: 72%;
+    }
+  }
+
+  /* iPad Pro (>= 900px) */
+  @media (min-width: 900px) {
+    :root {
+      --fs-md: 19px;
+      --fs-xl: 26px;
+      --sp-3: 20px;
+      --sp-4: 24px;
+      --radius-bubble: 20px;
+      --header-h: 68px;
+      --composer-h: 76px;
+      --msg-max-w: 65%;
+    }
+  }
+
+  /* 桌機 (>= 1024px) — 完整兩欄版 */
+  @media (min-width: 1024px) {
+    :root {
+      --fs-md: 17px;            /* 桌機反而可以小一點，密度高 */
+      --fs-lg: 19px;
+      --fs-xl: 26px;
+      --sp-3: 24px;
+      --sp-4: 28px;
+      --radius-bubble: 22px;
+      --header-h: 72px;
+      --composer-h: 80px;
+      --max-w-wide: 1200px;
+      --msg-max-w: 60%;
+    }
+  }
+
+  /* 4K / 大桌機 */
+  @media (min-width: 1600px) {
+    :root {
+      --fs-md: 18px;
+      --sp-3: 28px;
+      --sp-4: 32px;
+      --msg-max-w: 50%;
+    }
   }
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -240,8 +315,8 @@
     display: flex; flex-direction: column; gap: var(--sp-2);
   }
   .msg {
-    max-width: min(92%, 720px);  /* 手機 92%、桌機用 px 上限避免氣泡太寬 */
-    padding: clamp(8px, 1.6vw, 14px) clamp(10px, 2.4vw, 18px);
+    max-width: var(--msg-max-w);
+    padding: var(--sp-2) var(--sp-3);
     border-radius: var(--radius-bubble);
     line-height: 1.5;
     font-size: var(--fs-md);
@@ -255,20 +330,14 @@
     from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
   }
-  @media (min-width: 768px) {
-    .msg { max-width: 70%; }
-  }
-  @media (min-width: 1024px) {
-    .msg { max-width: 60%; }
-  }
   .msg.user {
     align-self: flex-end;
     background: linear-gradient(135deg, #ec4899 0%, #fb923c 100%);
-    color: white; border-bottom-right-radius: clamp(4px, 1vw, 6px);
+    color: white; border-bottom-right-radius: 6px;
   }
   .msg.assistant {
     align-self: flex-start;
-    background: white; color: #1f2937; border-bottom-left-radius: clamp(4px, 1vw, 6px);
+    background: white; color: #1f2937; border-bottom-left-radius: 6px;
   }
   .msg.error { align-self: flex-start; background: #fee2e2; color: #b91c1c; }
   .msg.system {
