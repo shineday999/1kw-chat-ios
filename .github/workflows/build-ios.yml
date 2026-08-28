@@ -40,9 +40,15 @@ jobs:
       - name: Capacitor sync
         run: npx cap sync ios
 
-      - name: Install pods
+      - name: Install pods (only if Podfile exists)
         working-directory: ios
-        run: pod install
+        run: |
+          if [ -f Podfile ]; then
+            echo "Podfile found, running pod install"
+            pod install
+          else
+            echo "No Podfile (Capacitor 8 uses SPM), skipping"
+          fi
 
       - name: List signing identities
         run: |
