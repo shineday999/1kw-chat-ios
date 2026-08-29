@@ -506,7 +506,7 @@
   const LS = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } };
   const SS = (k, v) => localStorage.setItem(k, JSON.stringify(v));
 
-  let cfg = LS("1kw-chat-cfg", {
+  let cfg = {
     apiUrl: "http://100.117.83.39:8082/v1",
     apiKey: "qwen_local_access",
     model: "",
@@ -514,7 +514,9 @@
     topp: 0.95,
     max: 4096,
     system: "你是 1kw 的本地助手，回答簡潔。",
-  });
+  };
+  // 從 localStorage 還原（如果有存過）
+  try { cfg = { ...cfg, ...JSON.parse(localStorage.getItem("1kw-chat-cfg") || "{}") }; } catch {}
   let chats = LS("1kw-chat-chats", [{ id: "default", title: "新對話", messages: [] }]);
   let currentChatId = LS("1kw-chat-current", "default");
   let models = [];
@@ -522,17 +524,12 @@
 
   // -------- Elements --------
   const $ = (id) => document.getElementById(id);
-  const apiUrl = $("api-url"), apiKey = $("api-key"), modelEl = $("model"),
-        tempEl = $("temp"), toppEl = $("topp"), maxEl = $("max"), sysEl = $("system"),
-        saveBtn = $("save"), clearBtn = $("clear"),
-        sendBtn = $("send"), inputEl = $("input"),
+  // 設定 UI 已移除，元素只剩 send/input/messages/status/sidebar
+  const sendBtn = $("send"), inputEl = $("input"),
         msgEl = $("messages"), statusEl = $("status"),
         chatListEl = $("chat-list"), newChatBtn = $("new-chat-btn");
+  // 相容舊版 localStorage key（如果曾存過）
 
-  function loadCfg() {
-    apiUrl.value = cfg.apiUrl; apiKey.value = cfg.apiKey; modelEl.value = cfg.model;
-    tempEl.value = cfg.temp; toppEl.value = cfg.topp; maxEl.value = cfg.max; sysEl.value = cfg.system;
-  }
   function currentChat() {
     return chats.find(c => c.id === currentChatId) || chats[0];
   }
@@ -643,8 +640,6 @@
       const j = await r.json();
       models = (j.data || []).map(m => m.id);
       if (!cfg.model && models.length) cfg.model = models[0];
-      modelEl.placeholder = models.length ? models.join(" / ") : "(輸入模型名)";
-      modelEl.value = cfg.model;
     } catch (e) {
       // silently fail — manual input still works
     }
@@ -734,33 +729,7 @@
   }
 
   // -------- Events --------
-  // 設定區摺疊切換
-  document.querySelector(".settings-toggle").onclick = () => {
-    document.getElementById("settings-inline").classList.toggle("collapsed");
-  };
-
-  saveBtn.onclick = () => {
-    cfg = {
-      apiUrl: apiUrl.value.trim().replace(/\/+$/, "") || cfg.apiUrl,
-      apiKey: apiKey.value.trim(),
-      model: modelEl.value.trim(),
-      temp: parseFloat(tempEl.value),
-      topp: parseFloat(toppEl.value),
-      max: parseInt(maxEl.value, 10),
-      system: sysEl.value,
-    };
-    SS("1kw-chat-cfg", cfg);
-    saveBtn.textContent = "✓ 儲存";
-    setTimeout(() => saveBtn.textContent = "儲存", 1200);
-    checkHealth(); loadModels();
-  };
-  clearBtn.onclick = () => {
-    if (!confirm("清空目前對話？")) return;
-    const chat = currentChat();
-    chat.messages = [];
-    saveChats();
-    renderMessages();
-  };
+  // 設定 UI 已移除；cfg 直接用 JS 內建預設值（從 localStorage 還原）
   newChatBtn.onclick = newChat;
   sendBtn.onclick = send;
   inputEl.addEventListener("keydown", (e) => {
@@ -772,7 +741,7 @@
   });
 
   // -------- Boot --------
-  loadCfg(); renderSidebar(); renderMessages();
+  renderSidebar(); renderMessages();
   checkHealth(); loadModels();
   setInterval(checkHealth, 30000);
 
