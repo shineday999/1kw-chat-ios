@@ -12,100 +12,97 @@
 <title>1kw Chat</title>
 <style>
   /* ==================================================================
-     Design tokens — 用 @media 階梯式而不是 vw clamp
-     因為 vw 在窄手機算出的 px 太小沒意義，桌機又會爆衝
-     iOS HIG 建議 iPhone 17px base，這裡用 16-19px 階梯
+     Design tokens — iOS HIG 標準：iPhone 17px base，這版拉到 18-19px
+     因為聊天 App 內容字應該明顯大一點才舒服
      ================================================================== */
   :root {
     /* default = iPhone（小螢幕基線） */
-    --fs-xs: 12px;
-    --fs-sm: 13px;
-    --fs-md: 16px;   /* 主字體 */
-    --fs-lg: 17px;
-    --fs-xl: 20px;   /* 標題 */
-    --sp-1: 4px;
-    --sp-2: 8px;
-    --sp-3: 12px;
-    --sp-4: 16px;
-    --radius-bubble: 14px;
-    --radius-btn: 10px;
-    --header-h: 52px;
-    --composer-h: 60px;
+    --fs-xs: 14px;
+    --fs-sm: 15px;
+    --fs-md: 18px;   /* 主字體：iPhone 18px，比之前 16px 大 12.5% */
+    --fs-lg: 20px;
+    --fs-xl: 26px;   /* 標題 */
+    --sp-1: 6px;
+    --sp-2: 12px;
+    --sp-3: 16px;
+    --sp-4: 20px;
+    --radius-bubble: 18px;
+    --radius-btn: 12px;
+    --header-h: 60px;
+    --composer-h: 72px;
     --max-w: 100%;
-    --max-w-wide: 100%;
-    --msg-max-w: 92%;
+    --msg-max-w: 88%;
   }
 
   /* iPhone 大尺寸 (>= 414px) — iPhone Plus / Pro Max */
   @media (min-width: 414px) {
     :root {
-      --fs-md: 17px;
-      --fs-lg: 18px;
-      --fs-xl: 22px;
-      --sp-2: 10px;
-      --sp-3: 14px;
-      --sp-4: 18px;
-      --radius-bubble: 16px;
-      --header-h: 56px;
-      --composer-h: 64px;
-      --msg-max-w: 88%;
+      --fs-md: 19px;
+      --fs-lg: 21px;
+      --fs-xl: 28px;
+      --sp-2: 14px;
+      --sp-3: 18px;
+      --sp-4: 22px;
+      --radius-bubble: 20px;
+      --header-h: 64px;
+      --composer-h: 76px;
+      --msg-max-w: 84%;
     }
   }
 
   /* 平板 (>= 600px) — iPad / 大折疊機 */
   @media (min-width: 600px) {
     :root {
-      --fs-md: 18px;
-      --fs-lg: 19px;
-      --fs-xl: 24px;
-      --sp-2: 12px;
-      --sp-3: 16px;
-      --sp-4: 20px;
-      --radius-bubble: 18px;
-      --radius-btn: 12px;
-      --header-h: 64px;
-      --composer-h: 72px;
+      --fs-md: 20px;
+      --fs-lg: 22px;
+      --fs-xl: 30px;
+      --sp-2: 16px;
+      --sp-3: 20px;
+      --sp-4: 24px;
+      --radius-bubble: 22px;
+      --radius-btn: 14px;
+      --header-h: 72px;
+      --composer-h: 84px;
       --max-w: 760px;
-      --msg-max-w: 72%;
+      --msg-max-w: 70%;
     }
   }
 
   /* iPad Pro (>= 900px) */
   @media (min-width: 900px) {
     :root {
-      --fs-md: 19px;
-      --fs-xl: 26px;
-      --sp-3: 20px;
-      --sp-4: 24px;
-      --radius-bubble: 20px;
-      --header-h: 68px;
-      --composer-h: 76px;
-      --msg-max-w: 65%;
-    }
-  }
-
-  /* 桌機 (>= 1024px) — 完整兩欄版 */
-  @media (min-width: 1024px) {
-    :root {
-      --fs-md: 17px;            /* 桌機反而可以小一點，密度高 */
-      --fs-lg: 19px;
-      --fs-xl: 26px;
+      --fs-md: 21px;
+      --fs-xl: 32px;
       --sp-3: 24px;
       --sp-4: 28px;
-      --radius-bubble: 22px;
-      --header-h: 72px;
-      --composer-h: 80px;
-      --max-w-wide: 1200px;
+      --radius-bubble: 24px;
+      --header-h: 76px;
+      --composer-h: 88px;
       --msg-max-w: 60%;
     }
   }
 
-  /* 4K / 大桌機 */
-  @media (min-width: 1600px) {
+  /* 桌機 (>= 1024px) */
+  @media (min-width: 1024px) {
     :root {
-      --fs-md: 18px;
+      --fs-md: 18px;            /* 桌機密度高一點 */
+      --fs-lg: 20px;
+      --fs-xl: 30px;
       --sp-3: 28px;
       --sp-4: 32px;
+      --radius-bubble: 24px;
+      --header-h: 72px;
+      --composer-h: 84px;
+      --msg-max-w: 55%;
+    }
+  }
+
+  /* 4K */
+  @media (min-width: 1600px) {
+    :root {
+      --fs-md: 20px;
+      --sp-3: 32px;
+      --sp-4: 36px;
       --msg-max-w: 50%;
     }
   }
@@ -117,7 +114,7 @@
     width: 100%; height: 100%;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Microsoft JhengHei", "Helvetica Neue", sans-serif;
     font-size: var(--fs-md);
-    line-height: 1.5;
+    line-height: 1.6;            /* 聊天內容用 1.6 行高舒服 */
     background: linear-gradient(135deg, #fdf2f8 0%, #fff7ed 50%, #fefce8 100%);
     color: #1f2937;
     overflow: hidden;
