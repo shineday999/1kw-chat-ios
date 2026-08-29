@@ -263,6 +263,22 @@
     font-size: var(--fs-sm);
     flex: 0 0 auto;
   }
+  /* 摺疊時只顯示一條小按鈕列，節省空間 */
+  #settings-inline.collapsed > :not(.settings-toggle) { display: none; }
+  #settings-inline.collapsed .settings-toggle { width: 100%; }
+  .settings-toggle {
+    border: none; border-radius: var(--radius-btn);
+    padding: var(--sp-2) var(--sp-3);
+    font-size: var(--fs-sm);
+    background: linear-gradient(135deg, #fce7f3, #fed7aa);
+    color: #be185d; font-weight: 600;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    gap: var(--sp-1);
+  }
+  .settings-toggle::before { content: "⚙ "; }
+  .settings-toggle::after { content: " ▾"; transition: transform 0.2s; }
+  #settings-inline:not(.collapsed) .settings-toggle::after { content: " ▴"; }
   #settings-inline label { color: #6b7280; font-size: var(--fs-xs); white-space: nowrap; }
   #settings-inline select,
   #settings-inline input[type="number"],
@@ -467,8 +483,9 @@
     <ul id="chat-list"></ul>
   </aside>
 
-  <!-- 設定列（手機顯示 / 桌機藏） -->
-  <div id="settings-inline">
+  <!-- 設定列（手機顯示 / 桌機藏） — 預設摺疊，只露一條 ⚙ 按鈕 -->
+  <div id="settings-inline" class="collapsed">
+    <button class="settings-toggle" type="button">設定 (API/模型/參數)</button>
     <label>API:</label>
     <input id="api-url" type="text" placeholder="http://100.117.83.39:8082/v1" />
     <label>Key:</label>
@@ -733,6 +750,11 @@
   }
 
   // -------- Events --------
+  // 設定區摺疊切換
+  document.querySelector(".settings-toggle").onclick = () => {
+    document.getElementById("settings-inline").classList.toggle("collapsed");
+  };
+
   saveBtn.onclick = () => {
     cfg = {
       apiUrl: apiUrl.value.trim().replace(/\/+$/, "") || cfg.apiUrl,
