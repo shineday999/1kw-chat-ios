@@ -12,57 +12,57 @@
 <title>1kw Chat</title>
 <style>
   /* ==================================================================
-     Design tokens — iOS HIG 標準：iPhone 17px base，這版拉到 18-19px
-     因為聊天 App 內容字應該明顯大一點才舒服
+     Design tokens — 死鬼要求字體再大一倍
+     iPhone 主字 18→36px、標題 26→52px
      ================================================================== */
   :root {
     /* default = iPhone（小螢幕基線） */
-    --fs-xs: 14px;
-    --fs-sm: 15px;
-    --fs-md: 18px;   /* 主字體：iPhone 18px，比之前 16px 大 12.5% */
-    --fs-lg: 20px;
-    --fs-xl: 26px;   /* 標題 */
-    --sp-1: 6px;
-    --sp-2: 12px;
-    --sp-3: 16px;
-    --sp-4: 20px;
-    --radius-bubble: 18px;
-    --radius-btn: 12px;
-    --header-h: 60px;
-    --composer-h: 72px;
+    --fs-xs: 28px;
+    --fs-sm: 30px;
+    --fs-md: 36px;   /* 主字體：iPhone 36px（之前 18px，×2） */
+    --fs-lg: 40px;
+    --fs-xl: 52px;   /* 標題：52px */
+    --sp-1: 12px;
+    --sp-2: 24px;
+    --sp-3: 32px;
+    --sp-4: 40px;
+    --radius-bubble: 32px;
+    --radius-btn: 22px;
+    --header-h: 96px;
+    --composer-h: 112px;
     --max-w: 100%;
-    --msg-max-w: 88%;
+    --msg-max-w: 92%;
   }
 
-  /* iPhone 大尺寸 (>= 414px) — iPhone Plus / Pro Max */
+  /* iPhone 大尺寸 (>= 414px) */
   @media (min-width: 414px) {
     :root {
-      --fs-md: 19px;
-      --fs-lg: 21px;
-      --fs-xl: 28px;
-      --sp-2: 14px;
-      --sp-3: 18px;
-      --sp-4: 22px;
-      --radius-bubble: 20px;
-      --header-h: 64px;
-      --composer-h: 76px;
-      --msg-max-w: 84%;
+      --fs-md: 38px;
+      --fs-lg: 42px;
+      --fs-xl: 56px;
+      --sp-2: 28px;
+      --sp-3: 36px;
+      --sp-4: 44px;
+      --radius-bubble: 36px;
+      --header-h: 104px;
+      --composer-h: 120px;
+      --msg-max-w: 88%;
     }
   }
 
-  /* 平板 (>= 600px) — iPad / 大折疊機 */
+  /* 平板 (>= 600px) */
   @media (min-width: 600px) {
     :root {
-      --fs-md: 20px;
-      --fs-lg: 22px;
-      --fs-xl: 30px;
-      --sp-2: 16px;
-      --sp-3: 20px;
-      --sp-4: 24px;
-      --radius-bubble: 22px;
-      --radius-btn: 14px;
-      --header-h: 72px;
-      --composer-h: 84px;
+      --fs-md: 40px;
+      --fs-lg: 44px;
+      --fs-xl: 60px;
+      --sp-2: 32px;
+      --sp-3: 40px;
+      --sp-4: 48px;
+      --radius-bubble: 40px;
+      --radius-btn: 26px;
+      --header-h: 112px;
+      --composer-h: 128px;
       --max-w: 760px;
       --msg-max-w: 70%;
     }
@@ -71,13 +71,13 @@
   /* iPad Pro (>= 900px) */
   @media (min-width: 900px) {
     :root {
-      --fs-md: 21px;
-      --fs-xl: 32px;
-      --sp-3: 24px;
-      --sp-4: 28px;
-      --radius-bubble: 24px;
-      --header-h: 76px;
-      --composer-h: 88px;
+      --fs-md: 42px;
+      --fs-xl: 64px;
+      --sp-3: 48px;
+      --sp-4: 56px;
+      --radius-bubble: 44px;
+      --header-h: 120px;
+      --composer-h: 136px;
       --msg-max-w: 60%;
     }
   }
@@ -85,14 +85,14 @@
   /* 桌機 (>= 1024px) */
   @media (min-width: 1024px) {
     :root {
-      --fs-md: 18px;            /* 桌機密度高一點 */
-      --fs-lg: 20px;
-      --fs-xl: 30px;
-      --sp-3: 28px;
-      --sp-4: 32px;
-      --radius-bubble: 24px;
-      --header-h: 72px;
-      --composer-h: 84px;
+      --fs-md: 36px;
+      --fs-lg: 40px;
+      --fs-xl: 60px;
+      --sp-3: 56px;
+      --sp-4: 64px;
+      --radius-bubble: 44px;
+      --header-h: 112px;
+      --composer-h: 128px;
       --msg-max-w: 55%;
     }
   }
@@ -100,9 +100,9 @@
   /* 4K */
   @media (min-width: 1600px) {
     :root {
-      --fs-md: 20px;
-      --sp-3: 32px;
-      --sp-4: 36px;
+      --fs-md: 40px;
+      --sp-3: 64px;
+      --sp-4: 72px;
       --msg-max-w: 50%;
     }
   }
@@ -373,14 +373,14 @@
   }
   #input {
     flex: 1;
-    border: 1px solid #fbcfe8; border-radius: clamp(16px, 3vw, 24px);
-    padding: clamp(8px, 1.5vw, 12px) clamp(12px, 2.5vw, 18px);
-    font-size: 16px; /* 固定 16px+ 避免 iOS auto-zoom（不受 clamp 影響） */
+    border: 1px solid #fbcfe8; border-radius: var(--radius-bubble);
+    padding: var(--sp-2) var(--sp-3);
+    font-size: var(--fs-md);   /* 跟著主字大小變；iPhone 36px，iOS 接受大於 16px */
     font-family: inherit;
     background: white; color: #1f2937;
     resize: none;
-    max-height: clamp(100px, 22vh, 180px);
-    min-height: clamp(40px, 5vw, 48px);
+    max-height: 30vh;
+    min-height: var(--composer-h);
     line-height: 1.4;
     outline: none;
     -webkit-appearance: none; appearance: none;
@@ -388,11 +388,11 @@
   #input:focus { border-color: #ec4899; box-shadow: 0 0 0 3px rgba(236,72,153,0.15); }
   #send {
     flex: 0 0 auto;
-    width: clamp(38px, 10vw, 44px);
-    height: clamp(38px, 10vw, 44px);
+    width: var(--composer-h);
+    height: var(--composer-h);
     border: none; border-radius: 50%;
     background: linear-gradient(135deg, #ec4899 0%, #fb923c 100%);
-    color: white; font-size: clamp(16px, 4vw, 20px); cursor: pointer;
+    color: white; font-size: var(--fs-xl); cursor: pointer;
     box-shadow: 0 4px 12px rgba(236,72,153,0.3);
     display: flex; align-items: center; justify-content: center;
     transition: transform 0.15s;
