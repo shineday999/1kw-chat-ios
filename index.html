@@ -398,7 +398,9 @@
     min-height: calc(var(--send-btn-size) + var(--sp-2) * 2);   /* 確保最小高度容納按鈕 */
   }
   #input {
-    flex: 1;
+    flex: 1 1 0;
+    min-width: 0;            /* 讓 flex item 可以縮到小於內容寬度 */
+    box-sizing: border-box;  /* padding 算在寬度內 */
     border: 1px solid #fbcfe8; border-radius: var(--radius-bubble);
     padding: var(--sp-2) var(--sp-3);
     font-size: var(--fs-md);
